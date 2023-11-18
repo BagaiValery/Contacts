@@ -13,7 +13,8 @@ namespace Contacts.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Job>().HasMany(o => o.Contacts).WithOne();
+            modelBuilder.Entity<Job>().HasMany(o => o.Contacts).WithOne(x => x.Job).HasForeignKey(x => x.JobId);
+            modelBuilder.Entity<Contact>().HasOne(c => c.Job).WithMany(x => x.Contacts).HasForeignKey(x => x.JobId).IsRequired(false);
         }
     }
 }

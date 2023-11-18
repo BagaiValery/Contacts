@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Contacts.Data;
 using Contacts.Models;
+using Contacts.ViewModels;
 
 namespace Contacts.Controllers
 {
@@ -99,25 +100,26 @@ namespace Contacts.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateOrEdit(int id, [Bind("Id,Name,MobilePhone,BirthDate")] Contact contact)
+        public async Task<IActionResult> CreateOrEdit(int id, [Bind("Id,Name,MobilePhone,BirthDate")] ViewContact contact)
         {
             if (ModelState.IsValid)
             {
+                var domainEntity = contact.ToContact();
                 if (id == 0)
                 {
-                    _context.Contacts.Add(contact);
-                    _context.SaveChanges();
+                    _context.Contacts.Add(domainEntity);
+                    await _context.SaveChangesAsync();
                 }
                 else
                 {
                     try
                     {
-                        _context.Update(contact);
+                        _context.Update(domainEntity);
                         await _context.SaveChangesAsync();
                     }
                     catch (DbUpdateConcurrencyException)
                     {
-                        if (!ContactExists(contact.Id))
+                        if (!ContactExists(domainEntity.Id))
                         {
                             return NotFound();
                         }
